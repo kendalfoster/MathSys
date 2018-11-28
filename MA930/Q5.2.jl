@@ -43,4 +43,27 @@ for n in 1:2*L+1
     ac_th[n] = (σ_ϵ^2/(1-ϕ^2))*ϕ^abs(n-L-1)
 end
 
-plot(collect(-L:1:L), ac_th, title="Theoretical and Computational Autocorrelation", xlabel="Value of n", ylabel="Autocorrelation", label="Theoretical")
+## Empirical Autocorrelation
+covarp = zeros(N)
+covarp[1] = var(X)
+covarn = zeros(N)
+X_r = reverse(X)
+
+for j =2:N
+    K = (N-j-1)
+    for k=1:K
+        n = j-1
+        k_= k+n
+        covarp[j] += (ϕ^(n))*((X[k]-X_mean)*(X[k_]-X_mean))
+        covarn[j] += (ϕ^(n))*((X_r[k]-X_mean)*(X_r[k_]-X_mean))
+    end
+    covarp[j] = covarp[j]/K
+    covarn[j] = covarn[j]/K
+end
+
+covarn = reverse(covarn)
+covar = vcat(covarn[1:end-1],covarp)
+
+## Plotting
+plot(collect(-L:1:L), ac_th, title="Theoretical and Empirical Autocorrelation", xlabel="Value of n", ylabel="Autocorrelation", label="Theoretical")
+plot!(collect(-L:1:L), covar[N-L:N+L], label="Empirical")
