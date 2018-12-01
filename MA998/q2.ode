@@ -1,0 +1,14 @@
+# MA998 Assignment Question 2
+# q2.ode
+#
+# equations
+c'=mu*kf*h*(b+(V*c)/(k1+c))-(gamma*c)/(kgam+c)+beta
+h'=((k2*k2)/(k2*k2+c*c)-h)/tau
+#
+# parameters
+par mu,b=0.111,V=0.889,beta=0.02,gamma=2,tau=2,k1=0.7,kgam=0.1,k2=0.7,kf=8.1
+#
+# initial conditions
+# (blank for now)
+#
+done
