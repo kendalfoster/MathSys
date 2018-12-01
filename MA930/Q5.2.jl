@@ -12,7 +12,7 @@ pyplot()
 ## Define Parameters
 c = 1
 ϕ = 0.5
-σ_ϵ = 2
+σϵ = 2
 N = 5000 # timesteps
 st = sqrt(2)/10
 
@@ -26,7 +26,8 @@ for n in 2:N
 end
 
 ## Plotting
-plot(X, title="Autoregressive Model Simulation", xlabel="Timestep", ylabel="X Value", legend=false)
+plot_52i = plot(X, title="Autoregressive Model Simulation", xlabel="Timestep", ylabel="X Value", legend=false)
+savefig(plot_52i, "Images/plot_52i.png")
 
 ## Calculate the Sample Mean and Sample Variance
 X_mean = sum(X)/N
@@ -36,14 +37,18 @@ X_var = sum((X.-X_mean).^2)/N
 μ_th = c/(1-ϕ)
 σ_th = (σϵ^2)/(1-ϕ^2)
 
-## Theoretical Autocorrelation
+## Percent Error
+μ_pe = 100*abs(μ_th-X_mean)/μ_th
+σ_pe = 100*abs(σ_th-X_var)/σ_th
+
+## Theoretical Autocovariance
 L = 10 # [-L,L] is range for autocorrelation
 ac_th = zeros(2*L+1)
 for n in 1:2*L+1
-    ac_th[n] = (σ_ϵ^2/(1-ϕ^2))*ϕ^abs(n-L-1)
+    ac_th[n] = (σϵ^2/(1-ϕ^2))*ϕ^abs(n-L-1)
 end
 
-## Empirical Autocorrelation
+## Empirical Autocovariance
 covarp = zeros(N)
 covarp[1] = var(X)
 covarn = zeros(N)
@@ -54,8 +59,8 @@ for j =2:N
     for k=1:K
         n = j-1
         k_= k+n
-        covarp[j] += (ϕ^(n))*((X[k]-X_mean)*(X[k_]-X_mean))
-        covarn[j] += (ϕ^(n))*((X_r[k]-X_mean)*(X_r[k_]-X_mean))
+        covarp[j] += ((X[k]-X_mean)*(X[k_]-X_mean))
+        covarn[j] += ((X_r[k]-X_mean)*(X_r[k_]-X_mean))
     end
     covarp[j] = covarp[j]/K
     covarn[j] = covarn[j]/K
@@ -65,5 +70,6 @@ covarn = reverse(covarn)
 covar = vcat(covarn[1:end-1],covarp)
 
 ## Plotting
-plot(collect(-L:1:L), ac_th, title="Theoretical and Empirical Autocorrelation", xlabel="Value of n", ylabel="Autocorrelation", label="Theoretical")
+plot_52ii = plot(collect(-L:1:L), ac_th, title="Theoretical and Empirical Autocorrelation", xlabel="Value of n", ylabel="Autocorrelation", label="Theoretical")
 plot!(collect(-L:1:L), covar[N-L:N+L], label="Empirical")
+savefig(plot_52ii, "Images/plot_52ii")
