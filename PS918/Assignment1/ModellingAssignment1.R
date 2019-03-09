@@ -52,18 +52,21 @@ med_expert <- filter(med, group == "experienced" | group == "inexperienced")
 ll_diffusion <- function(pars, rt, response) {
   densities <- tryCatch(
     ddiffusion(rt, response=response,
-               a=pars[1], v=pars[2], t0=pars[3]),
+               a=pars[1], v=pars[2], t0=pars[3],
+               z=pars[4], sv=pars[5], st0=pars[6], sz=0),
     error = function(e) 0)
   if (any(densities == 0)) return(1e6)
   return(-sum(log(densities)))
 }
 
 # Testing
-# par1 <- c(a = 0.8, v = 1, t0 = 0.1)
 par1 <- c(
-  a = runif(1, 0.5, 2),
+  a = runif(1, 0.5, 3),
   v = rnorm(1, 0, 2),
-  t0 = runif(1, 0.1, 0.5)
+  t0 = runif(1, 0, 0.5),
+  z = runif(1, 0.4, 0.6),
+  sv = runif(1, 0, 0.5),
+  st0 = runif(1, 0, 0.5)
 )
 ll_diffusion(pars=par1, rt=med_expert$rt, response=med_expert$ul)
 
@@ -77,16 +80,18 @@ nlminb(par1, ll_diffusion,
 # Avoiding Local Optima
 get_start_values <- function() {
   c(
-    a = runif(1, 0.5, 2),
+    a = runif(1, 0.5, 3),
     v = rnorm(1, 0, 2),
-    t0 = runif(1, 0.1, 0.5)
+    t0 = runif(1, 0, 0.5),
+    z = runif(1, 0.4, 0.6),
+    sv = runif(1, 0, 0.5),
+    st0 = runif(1, 0, 0.5)
   )
 }
 
 # Experts
 nruns <- 5
-
-unique_experts <- unique(med_expert$id)
+unique_experts <- sort(unique(med_expert$id))
 res_expert <- matrix()
 for (i in 1:length(unique_experts)) {
   med_temp <- filter(med_expert, id==unique_experts[i])
@@ -102,8 +107,7 @@ res_expert <- subset(res_expert, select=-c(res_expert))
 
 # Novices
 nruns <- 5 # redefined here
-
-unique_novices <- unique(med_novice$id)
+unique_novices <- sort(unique(med_novice$id))
 res_novice <- matrix()
 for (i in 1:length(unique_novices)) {
   med_temp <- filter(med_novice, id==unique_novices[i])
